@@ -7,7 +7,6 @@ class PrivatBankAPI:
 
     async def fetch_exchange_rate(self, session, date):
         url = self.BASE_URL + date
-
         try:
             async with session.get(url) as response:
                 response.raise_for_status()
@@ -16,9 +15,8 @@ class PrivatBankAPI:
             print(f"Error fetching for {date}: {e}")
             return None
 
-    async def def_exhcange_rates(self, days:int, currecncies: list):
+    async def get_exchange_rates(self, days: int, currencies: list):
         results = []
-
         async with aiohttp.ClientSession() as session:
             for i in range(days):
                 date = (datetime.now() - timedelta(days=i)).strftime("%d.%m.%Y")
@@ -27,15 +25,12 @@ class PrivatBankAPI:
                     continue
 
                 day_result = {}
-
                 for rate in data.get("exchangeRate", []):
-                    if rate.get("currency") in currecncies:
+                    if rate.get("currency") in currencies:
                         day_result[rate["currency"]] = {
                             "sale": rate.get("saleRate"),
                             "purchase": rate.get("purchaseRate"),
                         }
-                
                 if day_result:
                     results.append({date: day_result})
-
         return results
